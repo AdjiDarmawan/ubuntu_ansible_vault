@@ -1,0 +1,118 @@
+---
+- name: 0. Install Support Packages
+  apt:
+    name:
+      - jq
+      - curl
+      - wget
+      - unzip
+    state: latest
+  tags:
+    - install_packages
+
+- name: 1. Create Consul Group
+  group:
+    name: "{{ consul_group }}"
+  tags:
+    - create_user_and_group
+
+- name: 2. Create Consul User
+  user:
+    name: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    # append: yes
+    system: yes
+    shell: "/usr/sbin/nologin"
+    createhome: no
+    comment: "Create User No Login"
+    # stste: present
+  tags:
+    - create_user_and_group
+
+- name: 3. Open Consul Ports
+  ufw:
+    rule: allow
+    port: 8500,8600,8301
+    proto: tcp
+  tags:
+    - open_consul_ports
+
+- name: 4. Enable Everything allow with UFW
+  ufw:
+    state: enabled
+    policy: allow
+  tags:
+    - Open_Ports
+
+- name: 5. Create Consul Directory
+  file:
+    path: "{{ consul_directory_path }}"
+    state: directory
+  tags:
+    - create_consul_directory
+
+# - name: 4. Create Group
+#   group:
+#     name: consul
+#     system: no
+#     state: present
+#   tags:
+#     - create_user_and_group
+#
+# - name: 5. Create User
+#   user:
+#     name: consul
+#     group: consul
+#   tags:
+#     - create_user_and_group
+
+- name: 6. Create Consul Directory Configuration
+  file:
+    path: "{{ item }}"
+    mode: 775
+    state: directory
+  with_items:
+    - "{{ consul_directory_configuration_path }}"
+    - "{{ consul_directoty_data_path }}"
+  tags:
+    - create_consul_directory
+
+- name: 7. Download Consul
+  get_url:
+    url: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_amd64.zip"
+    dest: "/tmp/consul_{{ consul_version }}_linux_amd64.zip"
+  tags:
+    - download_consul
+
+- name: 8. Extract Consul Archive
+  unarchive:
+    src: "/tmp/consul_{{ consul_version }}_linux_amd64.zip"
+    dest: "{{ consul_binary_directory_path }}"
+    remote_src: True
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: 0755
+  tags:
+    - download_consul
+
+- name: 9. Create Consul Config File
+  template:
+    src: "templates/config.json.j2"
+    dest: "{{ consul_configuration_file }}"
+  tags:
+    - copy-consul-config
+
+- name: 10. Create Systemd Consul Service
+  template:
+    src: "templates/consul.service.j2"
+    dest: "{{ consul_systemd_path }}"
+  register: systemd
+  tags:
+    - copy-systemd
+
+# - name: 11. Reload Systemd When Change
+#   systemd:
+#     daemon_reload: yes
+#   when: systemd.changed
+#   tags:
+#     - systemd-daemon-reload

@@ -1,0 +1,15 @@
+[Unit]
+Description=Consul server process
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=on-failure
+ExecStart=/usr/local/bin/consul agent -config-dir /etc/consul.d/agent
+KillSignal=SIGTERM
+User=consul
+Group=consul
+
+[Install]
+WantedBy=multi-user.target

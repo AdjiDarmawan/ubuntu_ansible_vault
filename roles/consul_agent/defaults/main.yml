@@ -1,0 +1,39 @@
+---
+# defaults file for consul
+
+consul_version: "1.6.2"
+env: "development"
+domain: "consul.net"
+datacenter: "development"
+data_dir: "/var/lib/consul"
+encrypt: "s0M3r4ND0Mp45Sw0rdH3r3"
+force_update: "False"
+consul_tls: false
+
+# Set true if consul server enabled cloudmetadata for autocluster
+autoscaling: false
+tag_key: ""
+tag_value: ""
+
+# ACL
+acl_master_token: ""
+
+consul_token: ""
+consul_server: "False"
+consul_agent: "True"
+consul_join: [ ]
+join_domain: "consul.net"
+
+# Service variable
+service_name: "example"
+
+# Health check param
+port_checks: [ ]
+http_checks: [ ]
+process_checks: [ ]
+
+# watches variable
+consul_watcher: "True"
+type_watches: ""
+prefix_watches: ""
+args_watches: [ ]

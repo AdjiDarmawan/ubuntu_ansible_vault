@@ -1,0 +1,98 @@
+---
+- name: 1. Create vault Group
+  group:
+    name: "{{ vault_group }}"
+  tags:
+    - create_user_and_group
+
+- name: 2. Create vault User
+  user:
+    name: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    # append: yes
+    system: yes
+    shell: "/usr/sbin/nologin"
+    createhome: no
+    comment: "Create User No Login"
+    # stste: present
+  tags:
+    - create_user_and_group
+
+- name: 3. Open Vault Ports
+  ufw:
+    rule: allow
+    port: 8200,8300
+    proto: tcp
+  tags:
+    - open_vault_port
+
+- name: 4. Enable Everything Service/Ports with ufw
+  ufw:
+    state: enabled
+    policy: allow
+  tags:
+    - open_vault_port
+
+- name: 5. Create Vault Directy
+  file:
+    path: "{{ item }}"
+    state: directory
+    # mode: 0755
+    # owner: "{{ vault_user }}"
+    # group: "{{ vault_group }}"
+  with_items:
+    - "{{ vault_directory_path }}"
+    - "{{ vault_log_directory }}"
+  tags:
+    - create_vault_directory
+
+- name: 6. Create Vault Log File
+  file:
+    path: "{{ vault_log_file_path }}"
+    # mode: "{{ vault_mode }}"
+    # owner: "{{ root_mode }}"
+    # group: "{{ root_group }}"
+    state: touch
+  tags:
+    - create_vault_logs
+
+- name: 4. Download vault
+  get_url:
+    url: "https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip"
+    dest: "/tmp/vault_{{ vault_version }}_linux_amd64.zip"
+  tags:
+    - download-vault
+
+- name: 5. Extract vault file
+  unarchive:
+    src: "/tmp/vault_{{ vault_version }}_linux_amd64.zip"
+    dest: "{{ vault_binary_directory_path }}"
+    remote_src: True
+    # owner: "{{ vault_user }}"
+    # group: "{{ vault_group }}"
+    mode: 0755
+  tags:
+    - extract-vault
+
+- name: 6. Copy vault config template
+  template:
+    src: templates/config.json.j2
+    dest: "{{ vault_configuration_file }}"
+  tags:
+    - copy-vault-config
+
+- name: 7. Copy systemd service
+  copy:
+    src: templates/vault.service.j2
+    dest: "{{ vault_systemd_file }}"
+  tags:
+    - copy-vault-systemd
+#
+# - name: Restart vault
+#   systemd:
+#     name: vault
+#     state: restarted
+#   notify:
+#     - enable vault
+#   tags:
+#     - restart-vault

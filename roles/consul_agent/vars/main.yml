@@ -1,0 +1,33 @@
+---
+#Path Information
+dest_myhosts_file: /etc
+
+#Consul Information
+consul_version: "1.7.0"
+consul_group: "consul"
+consul_user: "consul"
+
+consul_binary_directory_path: "/usr/local/bin"
+consul_directory_path: "/etc/consul.d"
+consul_directory_configuration_path: "/etc/consul.d/agent"
+consul_directoty_data_path: "/etc/consul.d/data"
+consul_configuration_file: "/etc/consul.d/agent/config.json"
+consul_systemd_path: "/etc/systemd/system/consul.service"
+
+consul_agent_1:
+consul_agent_2:
+consul_agent_3:
+
+consul_server_1: 10.99.5.132
+consul_server_2: 10.99.4.90
+consul_server_3:
+
+datacenter_name: linkaja-consul-dc
+node_name: nessus-agent
+node_name_1: consul-client-01
+node_name_2: consul-client-02
+node_name_3: consul-client-03
+
+bind_addr: 10.99.3.31
+
+data_dir: /etc/consul.d/data

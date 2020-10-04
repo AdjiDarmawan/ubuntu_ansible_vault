@@ -1,0 +1,17 @@
+{
+  "server": false,
+  "datacenter": "{{ datacenter_name }}",
+  "node_name": "{{ node_name_1 }}",
+  "data_dir": "{{ consul_directoty_data_path }}",
+  "bind_addr": "{{ bind_addr }}",
+  "client_addr": "0.0.0.0",
+  "encrypt": "ec/ZMxN2VJj0iCfknTOBNOryIfZWaAd9oH5/WM1ElRg=",
+  "encrypt_verify_incoming": true,
+  "encrypt_verify_outgoing": true,
+  "retry_join": [
+    "{{ consul_server_1 }}",
+    "{{ consul_server_2 }}"
+  ],
+  "log_level": "DEBUG",
+  "enable_syslog": true
+}
